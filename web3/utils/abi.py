@@ -19,9 +19,14 @@ from eth_abi.abi import (
     process_type,
 )
 
+from web3.utils.compat.compat_codecs import (
+    setup_backslashreplace,
+)
 from web3.utils.formatters import (
     recursive_map
 )
+
+setup_backslashreplace()
 
 DEFAULT_RETURN_NORMALIZERS = [
     lambda typ, data: to_checksum_address(data) if typ == 'address' else data,
