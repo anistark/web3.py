@@ -1,5 +1,5 @@
-import re
 import itertools
+import re
 
 from eth_utils import (
     add_0x_prefix,
@@ -25,7 +25,7 @@ from web3.utils.formatters import (
 
 DEFAULT_RETURN_NORMALIZERS = [
     lambda typ, data: to_checksum_address(data) if typ == 'address' else data,
-    # lambda typ, data: data.decode(errors='ignore') if typ == 'string' else data,
+    lambda typ, data: data.decode(errors='backslashreplace') if typ == 'string' else data,
 ]
 
 
@@ -436,7 +436,6 @@ def data_tree_map(func, data_tree):
     return recursive_map(return_val_and_type, data_tree)
 
 
-@coerce_return_to_text
 def data_tree_vals(data_tree):
     return recursive_map(lambda els: els[1] if _is_two_tuple(els) else els, data_tree)
 
