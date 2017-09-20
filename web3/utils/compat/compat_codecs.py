@@ -1,24 +1,29 @@
 
+from __future__ import unicode_literals
+
 import codecs
 import sys
 
 
-def backslashreplace(ex):
-    # The error handler receives the UnicodeDecodeError, which contains arguments of the
-    # string and start/end indexes of the bad portion.
-    bstr, start, end = ex.args[1:4]
-
-    # The return value is a tuple of Unicode string and the index to continue conversion.
-    # Note: iterating byte strings returns int on 3.x but str on 2.x
-    return (
-        u''.join(
-            '\\x{:02x}'.format(c if isinstance(c, int) else ord(c))
-            for c in bstr[start:end]
-        ),
-        end,
-    )
+def _bytes_repr(c):
+    """py2: bytes, py3: int"""
+    if not isinstance(c, int):
+        c = ord(c)
+    return '\\x{:x}'.format(c)
 
 
-def setup_backslashreplace():
-    if sys.version_info[:2] < (3, 5):
-        codecs.register_error('backslashreplace', backslashreplace)
+def _text_repr(c):
+    d = ord(c)
+    if d >= 0x10000:
+        return '\\U{:08x}'.format(d)
+    else:
+        return '\\u{:04x}'.format(d)
+
+
+def backslashreplace_backport(ex):
+    s, start, end = ex.object, ex.start, ex.end
+    c_repr = _bytes_repr if isinstance(ex, UnicodeDecodeError) else _text_repr
+    return ''.join(c_repr(c) for c in s[start:end]), end
+
+if sys.version_info[:2] < (3, 5):
+    codecs.register_error('backslashreplace', backslashreplace_backport)

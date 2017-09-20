@@ -20,17 +20,15 @@ from eth_abi.abi import (
 )
 
 from web3.utils.compat.compat_codecs import (
-    setup_backslashreplace,
+    codecs
 )
 from web3.utils.formatters import (
     recursive_map
 )
 
-setup_backslashreplace()
-
 DEFAULT_RETURN_NORMALIZERS = [
     lambda typ, data: to_checksum_address(data) if typ == 'address' else data,
-    lambda typ, data: data.decode(errors='backslashreplace') if typ == 'string' else data,
+    lambda typ, data: codecs.decode(data, 'utf8', 'backslashreplace') if typ == 'string' else data,
 ]
 
 
